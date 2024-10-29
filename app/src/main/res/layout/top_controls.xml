@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/undo"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_arrow_undo"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/redo"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_arrow_redo"
+        app:layout_constraintStart_toEndOf="@id/undo" />
+
+    <ImageButton
+        android:id="@+id/bin"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_bin"
+        app:layout_constraintEnd_toStartOf="@id/new_draft" />
+
+    <ImageButton
+        android:id="@+id/new_draft"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_add_sheet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/stop"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_stop"
+        app:layout_constraintEnd_toStartOf="@id/play" />
+
+    <ImageButton
+        android:id="@+id/play"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_play"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</merge>
