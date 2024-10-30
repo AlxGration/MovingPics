@@ -9,7 +9,7 @@
     android:paddingVertical="16dp"
     android:theme="@style/Base.Theme.MovingPics"
     android:background="?attr/colorContainer"
-    tools:context=".presentation.FirstFragment">
+    tools:context=".presentation.PaintingFragment">
 
     <include
         layout="@layout/top_controls"

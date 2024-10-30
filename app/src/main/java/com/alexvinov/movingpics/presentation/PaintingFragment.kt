@@ -5,12 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
-import com.alexvinov.movingpics.R
 import com.alexvinov.movingpics.databinding.FragmentFirstBinding
-import dagger.hilt.android.AndroidEntryPoint
 
-class FirstFragment : Fragment() {
+class PaintingFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
     private val binding get() = _binding!!
