@@ -7,8 +7,8 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.alexvinov.movingpics.presentation.FirstFragment"
-        android:label="@string/first_fragment_label"
+        android:name="com.alexvinov.movingpics.presentation.PaintingFragment"
+        android:label="@string/painting_fragment_label"
         tools:layout="@layout/fragment_first">
     </fragment>
 </navigation>
