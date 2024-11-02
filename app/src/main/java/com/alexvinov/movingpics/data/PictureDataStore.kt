@@ -9,13 +9,17 @@ import com.alexvinov.movingpics.R
 class PictureDataStore(
     private val context: Context,
 ) {
+    private var width = 1
+    private var height = 1
+    private var last: Bitmap? = null
+    private var lastRemovePicture: Bitmap? = null
 
-    fun background(): Bitmap {
+    fun initialBackgroundPicture(): Bitmap {
         val bgDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_background, null)
         val bgBitmap =
             Bitmap.createBitmap(
-                bgDrawable?.intrinsicWidth ?: 1,
-                bgDrawable?.intrinsicHeight ?: 1,
+                bgDrawable?.intrinsicWidth ?: width,
+                bgDrawable?.intrinsicHeight ?: height,
                 Bitmap.Config.ARGB_8888,
             )
         val canvas = Canvas(bgBitmap)
@@ -25,17 +29,23 @@ class PictureDataStore(
         return bgBitmap
     }
 
-    private var last: Bitmap? = null
-
     fun save(picture: Bitmap) {
         last = picture
     }
 
-    fun empty(): Bitmap = Bitmap.createBitmap(
-        last?.width ?: 1,
-        last?.height ?: 1,
-        Bitmap.Config.ARGB_8888,
-    )
+    fun empty(): Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
-    fun last(): Bitmap? = last
+    fun last(): Bitmap? = last?.copy(Bitmap.Config.ARGB_8888, true)
+
+    fun removeLast() {
+        lastRemovePicture = last()
+        last = null
+    }
+
+    fun lastRemovedPicture(): Bitmap? = lastRemovePicture?.copy(Bitmap.Config.ARGB_8888, true)
+
+    fun initPictureSize(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
 }

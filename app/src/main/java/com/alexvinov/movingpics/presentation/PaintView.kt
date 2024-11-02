@@ -75,12 +75,12 @@ class PaintView(
             return
         }
 
+        drawingListener?.initViewSize(width, height)
         picture
             ?.let { bitmap ->
                 Bitmap.createScaledBitmap(bitmap, width, height, false)
             }?.also { bitmap ->
                 setPictureBitmap(bitmap)
-                drawingListener?.onDrawingFinished(bitmap)
             }
         background
             ?.let { bitmap ->
@@ -199,6 +199,7 @@ class PaintView(
 
     interface DrawingListener {
         fun onDrawingFinished(bitmap: Bitmap)
+        fun initViewSize(width: Int, height: Int)
     }
 
     fun setDrawingListener(listener: DrawingListener?) {

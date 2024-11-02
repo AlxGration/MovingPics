@@ -37,7 +37,7 @@ class HistoryHolder @Inject constructor() {
 
     fun hasRedoActions() = !historyBackup.isEmpty()
 
-    fun hasUndoActions() = history.size() > 1
+    fun hasUndoActions() = !history.isEmpty()
 
     fun lastPictureState() = history.last()
 

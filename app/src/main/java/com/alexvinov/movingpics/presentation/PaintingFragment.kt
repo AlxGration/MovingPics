@@ -48,6 +48,10 @@ class PaintingFragment : Fragment() {
             override fun onDrawingFinished(bitmap: Bitmap) {
                 viewModel.addLayer(bitmap)
             }
+
+            override fun initViewSize(width: Int, height: Int) {
+                viewModel.initPictureSize(width, height)
+            }
         })
 
         binding.paintingContainer.addView(
@@ -115,10 +119,10 @@ class PaintingFragment : Fragment() {
             redo.setOnClickListener {
                 viewModel.redoLastAction()
             }
-            newDraft.setOnClickListener {
+            newPicture.setOnClickListener {
                 viewModel.addNewPicture()
             }
-            bin.setOnClickListener {
+            removePicture.setOnClickListener {
                 viewModel.removePicture()
             }
         }

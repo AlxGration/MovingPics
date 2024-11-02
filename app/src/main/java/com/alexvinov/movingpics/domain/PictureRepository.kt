@@ -1,38 +1,58 @@
 package com.alexvinov.movingpics.domain
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import com.alexvinov.movingpics.data.PictureDataStore
+import com.alexvinov.movingpics.utils.BitmapUtils.mergeWith
 import javax.inject.Inject
 
 class PictureRepository @Inject constructor(
+    private val historyHolder: HistoryHolder,
     private val picturesStore: PictureDataStore,
 ) {
-    fun background(): Bitmap = picturesStore.background()
+    fun addLayer(bitmap: Bitmap) = historyHolder.addLayer(bitmap)
 
-    fun emptyPicture(): Bitmap {
-        return picturesStore.empty()
+    fun nextLayer() = historyHolder.redoLastAction()
+
+    fun previousLayer(): Bitmap {
+        return historyHolder.undoLastAction()
+            ?: picturesStore.lastRemovedPicture()
+            ?: picturesStore.empty()
+    }
+
+    fun savePicture(): Boolean {
+        val picture = historyHolder.lastPictureState()
+        picture?.let { picture ->
+            picturesStore.save(picture)
+            historyHolder.clear()
+        }
+        return picture != null
+    }
+
+    fun background(): Bitmap = picturesStore.initialBackgroundPicture()
+
+    fun emptyPicture() = picturesStore.empty()
+
+    fun removePicture() {
+        historyHolder.clear()
+        picturesStore.removeLast()
     }
 
     fun lastOrEmptyPicture(): Bitmap {
         return picturesStore.last() ?: picturesStore.empty()
     }
 
-    fun removeLastPicture(): Bitmap {
-        return picturesStore.background()
-    }
+    fun isHistoryEmpty(): Boolean = !historyHolder.hasUndoActions()
+
+    fun hasRedoActions() = historyHolder.hasRedoActions()
 
     fun backgroundWithLastPicture(): Bitmap {
-        val bitmap = background()
-        val canvas = Canvas(bitmap)
-        val paint = Paint()
-        paint.alpha = 60
-        canvas.drawBitmap(lastOrEmptyPicture(), 0f, 0f, paint)
-        return bitmap
+        val background = background()
+        return picturesStore.last()?.let {
+            background.mergeWith(bitmap = lastOrEmptyPicture(), alpha = 60)
+        } ?: background
     }
 
-    fun savePicture(picture: Bitmap) {
-        picturesStore.save(picture)
+    fun initPictureSize(width: Int, height: Int) {
+        picturesStore.initPictureSize(width, height)
     }
 }

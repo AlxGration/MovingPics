@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.Paint
 import androidx.lifecycle.ViewModel
 import com.alexvinov.movingpics.domain.BrushProvider
-import com.alexvinov.movingpics.domain.HistoryHolder
 import com.alexvinov.movingpics.domain.PictureRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +14,6 @@ import javax.inject.Inject
 @HiltViewModel
 class PaintingFragmentViewModel @Inject constructor(
     private val brushHolder: BrushProvider,
-    private val historyHolder: HistoryHolder,
     private val pictureRepository: PictureRepository,
 ) : ViewModel() {
 
@@ -35,21 +33,23 @@ class PaintingFragmentViewModel @Inject constructor(
     val hasRedoActionsState: StateFlow<Boolean> = _hasRedoActionsState.asStateFlow()
 
     fun addLayer(bitmap: Bitmap) {
-        historyHolder.addLayer(bitmap)
+        pictureRepository.addLayer(bitmap)
         setEnablingUndoRedoActions()
     }
 
+    fun initPictureSize(width: Int, height: Int) {
+        pictureRepository.initPictureSize(width, height)
+    }
+
     fun redoLastAction() {
-        historyHolder.redoLastAction()?.let { bitmap ->
-            _pictureState.value = bitmap
+        pictureRepository.nextLayer()?.let { picture ->
+            _pictureState.value = picture
         }
         setEnablingUndoRedoActions()
     }
 
     fun undoLastAction() {
-        historyHolder.undoLastAction()?.let { bitmap ->
-            _pictureState.value = bitmap
-        }
+        _pictureState.value = pictureRepository.previousLayer()
         setEnablingUndoRedoActions()
     }
 
@@ -67,23 +67,24 @@ class PaintingFragmentViewModel @Inject constructor(
     }
 
     fun addNewPicture() {
-        historyHolder.lastPictureState()?.let { picture ->
-            pictureRepository.savePicture(picture)
-            historyHolder.clear()
-            _backgroundState.value = pictureRepository.backgroundWithLastPicture()
-            _pictureState.value = pictureRepository.emptyPicture()
+        if(!pictureRepository.isHistoryEmpty()) {
+            if (pictureRepository.savePicture()) {
+                _backgroundState.value = pictureRepository.backgroundWithLastPicture()
+                _pictureState.value = pictureRepository.emptyPicture()
+                setEnablingUndoRedoActions()
+            }
         }
     }
 
     fun removePicture() {
-        historyHolder.clear()
         _pictureState.value = pictureRepository.lastOrEmptyPicture()
-        pictureRepository.removeLastPicture()
+        pictureRepository.removePicture()
         _backgroundState.value = pictureRepository.backgroundWithLastPicture()
+        setEnablingUndoRedoActions()
     }
 
     private fun setEnablingUndoRedoActions() {
-        _hasRedoActionsState.value = historyHolder.hasRedoActions()
-        _hasUndoActionsState.value = historyHolder.hasUndoActions()
+        _hasRedoActionsState.value = pictureRepository.hasRedoActions()
+        _hasUndoActionsState.value = !pictureRepository.isHistoryEmpty()
     }
 }

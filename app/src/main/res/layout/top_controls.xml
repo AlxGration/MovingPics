@@ -27,17 +27,17 @@
         app:layout_constraintStart_toEndOf="@id/undo" />
 
     <ImageButton
-        android:id="@+id/bin"
+        android:id="@+id/remove_picture"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:background="@color/transparent"
         android:src="@drawable/ic_bin"
         app:tint="@color/color_state_selector"
-        app:layout_constraintEnd_toStartOf="@id/new_draft" />
+        app:layout_constraintEnd_toStartOf="@id/new_picture" />
 
     <ImageButton
-        android:id="@+id/new_draft"
+        android:id="@+id/new_picture"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
