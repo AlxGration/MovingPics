@@ -12,6 +12,7 @@
         android:layout_gravity="center_vertical"
         android:background="@color/transparent"
         android:src="@drawable/ic_arrow_undo"
+        app:tint="@color/color_state_selector"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
@@ -22,6 +23,7 @@
         android:layout_marginStart="8dp"
         android:background="@color/transparent"
         android:src="@drawable/ic_arrow_redo"
+        app:tint="@color/color_state_selector"
         app:layout_constraintStart_toEndOf="@id/undo" />
 
     <ImageButton
@@ -31,6 +33,7 @@
         android:layout_gravity="center_vertical"
         android:background="@color/transparent"
         android:src="@drawable/ic_bin"
+        app:tint="@color/color_state_selector"
         app:layout_constraintEnd_toStartOf="@id/new_draft" />
 
     <ImageButton
@@ -52,6 +55,7 @@
         android:layout_marginEnd="16dp"
         android:background="@color/transparent"
         android:src="@drawable/ic_stop"
+        app:tint="@color/color_state_selector"
         app:layout_constraintEnd_toStartOf="@id/play" />
 
     <ImageButton
@@ -61,6 +65,7 @@
         android:layout_gravity="center_vertical"
         android:background="@color/transparent"
         android:src="@drawable/ic_play"
+        app:tint="@color/color_state_selector"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </merge>

@@ -9,7 +9,12 @@ import com.alexvinov.movingpics.R
 class PictureStorage(
     private val context: Context,
 ) {
-    fun initialPicture(): Bitmap {
+
+    fun lastPicture(): Bitmap {
+        return initialPicture()
+    }
+
+    private fun initialPicture(): Bitmap {
         val bgDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_background, null)
         val bgBitmap =
             Bitmap.createBitmap(

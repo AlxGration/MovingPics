@@ -5,7 +5,7 @@ import com.alexvinov.movingpics.utils.LimitedDeque
 import javax.inject.Inject
 
 class HistoryHolder @Inject constructor() {
-    // единица зарезервирована для хранения первоначальной битмапы (бэкграунда)
+    // единица зарезервирована для хранения последнего кадра (в случае переполнения лимита)
     private var history = LimitedDeque<Bitmap>(11)
     private var historyBackup = LimitedDeque<Bitmap>(10)
 
@@ -38,4 +38,6 @@ class HistoryHolder @Inject constructor() {
     fun hasRedoActions() = !historyBackup.isEmpty()
 
     fun hasUndoActions() = history.size() > 1
+
+    fun lastPictureState() = history.last()
 }

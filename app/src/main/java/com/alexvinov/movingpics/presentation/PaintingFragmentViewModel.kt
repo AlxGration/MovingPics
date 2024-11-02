@@ -14,15 +14,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PaintingFragmentViewModel @Inject constructor(
-    private val brushProvider: BrushProvider,
+    private val brushHolder: BrushProvider,
     private val historyHolder: HistoryHolder,
     private val pictureStorage: PictureStorage,
 ) : ViewModel() {
 
-    private val _pictureState = MutableStateFlow(pictureStorage.initialPicture())
+    private val _pictureState = MutableStateFlow(pictureStorage.lastPicture())
     val pictureState: StateFlow<Bitmap> = _pictureState.asStateFlow()
 
-    private val _brushState = MutableStateFlow(brushProvider.pen())
+    private val _brushState = MutableStateFlow(brushHolder.pen())
     val brushState: StateFlow<Paint> = _brushState.asStateFlow()
 
     private val _hasUndoActionsState = MutableStateFlow(false)
@@ -51,8 +51,8 @@ class PaintingFragmentViewModel @Inject constructor(
     }
 
     fun setUpPen(color: Int, width: Float) {
-        brushProvider.setUpPen(color, width)
-        _brushState.value = brushProvider.pen()
+        brushHolder.setUpPen(color, width)
+        _brushState.value = brushHolder.pen()
     }
 
     private fun setEnablingUndoRedoActions() {
