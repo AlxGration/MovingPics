@@ -11,13 +11,17 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.alexvinov.movingpics.R
 import com.alexvinov.movingpics.databinding.FragmentFirstBinding
+import com.alexvinov.movingpics.databinding.TopControlsBinding
+import com.alexvinov.movingpics.domain.HistoryHolder
 
 class PaintingFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
+    private var topControlsBinding: TopControlsBinding? = null
     private val binding get() = _binding!!
 
     private var paintingView: PaintView? = null
     private var brushProvider: BrushProvider = BrushProvider()
+    private var historyHolder: HistoryHolder? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,7 +29,29 @@ class PaintingFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        topControlsBinding = TopControlsBinding.bind(binding.root)
+        historyHolder = HistoryHolder()
+        setUpControls()
         return binding.root
+    }
+
+    private fun setUpControls() {
+        with(requireNotNull(topControlsBinding)) {
+            undo.setOnClickListener {
+                previousPicture()?.let { bitmap ->
+                    paintingView?.setBackgroundBitmap(bitmap)
+                }
+            }
+            redo.setOnClickListener {
+                historyHolder?.redoLastAction()?.let { bitmap ->
+                    paintingView?.setBackgroundBitmap(bitmap)
+                }
+            }
+        }
+    }
+
+    private fun previousPicture(): Bitmap? {
+        return historyHolder?.undoLastAction()
     }
 
     override fun onViewCreated(
@@ -33,7 +59,15 @@ class PaintingFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        paintingView = PaintView(requireContext(), brushProvider)
+        paintingView = PaintView(requireContext())
+        paintingView?.setPen(brushProvider.pen())
+        paintingView?.setDrawingListener(object : PaintView.DrawingListener{
+            override fun onDrawingFinished(bitmap: Bitmap) {
+                historyHolder?.addLayer(bitmap)
+            }
+        })
+        paintingView?.setBackgroundBitmap(getBitmap())
+
         binding.paintingContainer.addView(
             paintingView,
             FrameLayout.LayoutParams(
@@ -41,7 +75,6 @@ class PaintingFragment : Fragment() {
                 FrameLayout.LayoutParams.MATCH_PARENT,
             ),
         )
-        paintingView?.setBackground(getBitmap())
     }
 
     private fun getBitmap(): Bitmap {

@@ -3,17 +3,16 @@ package com.alexvinov.movingpics.presentation
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Path
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
-import kotlinx.coroutines.Job
 import java.util.concurrent.atomic.AtomicBoolean
 
 class PaintView(
     context: Context,
-    private val brushProvider: BrushProvider,
 ) : SurfaceView(context),
     SurfaceHolder.Callback,
     View.OnTouchListener,
@@ -25,9 +24,11 @@ class PaintView(
     private var drawingActive = AtomicBoolean(false)
 
     private val path = Path()
-    private var bitmapView: Bitmap? = null
+    private var pen = Paint()
     private var canvas: Canvas? = null
-    private var history: MutableList<Bitmap> = mutableListOf()
+    private var curBitmap: Bitmap? = null
+
+    private var drawingListener: DrawingListener? = null
 
     init {
         this.holder = getHolder()
@@ -35,8 +36,12 @@ class PaintView(
         setOnTouchListener(this)
     }
 
-    fun setBackground(bitmap: Bitmap) {
-        bitmapView = bitmap
+    fun setPen(pen: Paint) {
+        this.pen = pen
+    }
+
+    fun setBackgroundBitmap(bitmap: Bitmap) {
+        curBitmap = bitmap
         canvas = Canvas(bitmap)
     }
 
@@ -64,10 +69,14 @@ class PaintView(
         if (width == 0 || height == 0) {
             return
         }
-        bitmapView?.let { view ->
-            bitmapView = Bitmap.createScaledBitmap(view, width, height, false)
-            canvas = Canvas(requireNotNull(bitmapView))
-        }
+
+        curBitmap
+            ?.let { bitmap ->
+                Bitmap.createScaledBitmap(bitmap, width, height, false)
+            }?.also { bitmap ->
+                setBackgroundBitmap(bitmap)
+                drawingListener?.onDrawingFinished(bitmap)
+            }
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -77,38 +86,50 @@ class PaintView(
         surfaceReady.set(false)
     }
 
-    override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+    override fun onTouch(
+        view: View?,
+        event: MotionEvent?,
+    ): Boolean {
         event ?: return false
         val x = event.x
         val y = event.y
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> { touchDown(x, y) }
-            MotionEvent.ACTION_MOVE -> { touchMove(x, y) }
+            MotionEvent.ACTION_DOWN -> {
+                touchDown(x, y)
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                touchMove(x, y)
+            }
+
             MotionEvent.ACTION_UP -> {
                 touchUp()
-                bitmapView?.let { bitmap -> addNewLayer(bitmap) }
             }
+
             else -> {}
         }
         return true
     }
 
-    private fun touchDown(x: Float, y: Float) {
+    private fun touchDown(
+        x: Float,
+        y: Float,
+    ) {
         path.moveTo(x, y)
     }
 
-    private fun touchMove(x: Float, y: Float) {
+    private fun touchMove(
+        x: Float,
+        y: Float,
+    ) {
         path.lineTo(x, y)
         path.moveTo(x, y)
-        canvas?.drawPath(path, brushProvider.pen())
+        canvas?.drawPath(path, pen)
     }
 
     private fun touchUp() {
         path.reset()
-    }
-
-    private fun addNewLayer(bitmap: Bitmap) {
-        history.add(bitmap)
+        curBitmap?.let { bitmap -> drawingListener?.onDrawingFinished(bitmap) }
     }
 
     override fun run() {
@@ -117,13 +138,14 @@ class PaintView(
 
             val startFrameTime = System.nanoTime()
             holder?.lockCanvas()?.let { canvas ->
-                bitmapView?.let { bitmap ->
+                curBitmap?.let { bitmap ->
                     try {
                         canvas.drawBitmap(bitmap, 0f, 0f, null)
-                    } finally {
-                        holder?.unlockCanvasAndPost(canvas)
+                    } catch (err: Throwable) {
+                        err.printStackTrace()
                     }
                 }
+                holder?.unlockCanvasAndPost(canvas)
             }
 
             val frameTime = (System.nanoTime() - startFrameTime) / 1000000
@@ -137,8 +159,6 @@ class PaintView(
             }
         }
     }
-
-    val thread: Job? = null
 
     private fun stopDrawing() {
         drawThread ?: return
@@ -162,6 +182,14 @@ class PaintView(
             drawingActive.set(true)
             drawThread?.start()
         }
+    }
+
+    interface DrawingListener {
+        fun onDrawingFinished(bitmap: Bitmap)
+    }
+
+    fun setDrawingListener(listener: DrawingListener?) {
+        drawingListener = listener
     }
 
     companion object {
