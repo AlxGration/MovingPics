@@ -70,7 +70,7 @@ class PaintingFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.pictureState.collect { picture ->
-                   paintingView?.setBackgroundBitmap(picture)
+                    paintingView?.setBackgroundBitmap(picture)
                 }
             }
         }
@@ -116,16 +116,10 @@ class PaintingFragment : Fragment() {
     private fun setUpBottomControls() {
         with(binding.bottomControlsContainer) {
             eraser.setOnClickListener {
-                viewModel.setUpPen(
-                    color = Color.WHITE,
-                    width = 5f,
-                )
+                viewModel.pickEraser()
             }
-            colorPicker.setOnClickListener {
-                viewModel.setUpPen(
-                    color = Color.RED,
-                    width = 5f,
-                )
+            pen.setOnClickListener {
+                viewModel.pickPen()
             }
         }
     }

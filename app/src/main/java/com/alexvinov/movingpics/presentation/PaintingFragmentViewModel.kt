@@ -55,6 +55,14 @@ class PaintingFragmentViewModel @Inject constructor(
         _brushState.value = brushHolder.pen()
     }
 
+    fun pickPen(){
+        _brushState.value = brushHolder.pen()
+    }
+
+    fun pickEraser(){
+        _brushState.value = brushHolder.eraser()
+    }
+
     private fun setEnablingUndoRedoActions() {
         _hasRedoActionsState.value = historyHolder.hasRedoActions()
         _hasUndoActionsState.value = historyHolder.hasUndoActions()

@@ -123,7 +123,6 @@ class PaintView(
         y: Float,
     ) {
         path.lineTo(x, y)
-        path.moveTo(x, y)
         canvas?.drawPath(path, pen)
     }
 
