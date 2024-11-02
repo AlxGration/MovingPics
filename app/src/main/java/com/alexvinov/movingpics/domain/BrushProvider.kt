@@ -1,9 +1,10 @@
-package com.alexvinov.movingpics.presentation
+package com.alexvinov.movingpics.domain
 
 import android.graphics.Color
 import android.graphics.Paint
+import javax.inject.Inject
 
-class BrushProvider {
+class BrushProvider @Inject constructor() {
     private val pen = Paint()
 
     init {
@@ -12,12 +13,13 @@ class BrushProvider {
         setUpPen(color = Color.BLACK)
     }
 
-    fun setUpPen(color: Int, width: Float = 3f) {
+    fun setUpPen(
+        color: Int,
+        width: Float = 3f,
+    ) {
         pen.color = color
         pen.strokeWidth = width
     }
 
-    fun pen(): Paint {
-        return pen
-    }
+    fun pen(): Paint = pen
 }

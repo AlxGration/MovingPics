@@ -1,27 +1,32 @@
 package com.alexvinov.movingpics.presentation
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.alexvinov.movingpics.R
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.alexvinov.movingpics.databinding.FragmentFirstBinding
 import com.alexvinov.movingpics.databinding.TopControlsBinding
-import com.alexvinov.movingpics.domain.HistoryHolder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class PaintingFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
     private var topControlsBinding: TopControlsBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: PaintingFragmentViewModel by viewModels()
+
     private var paintingView: PaintView? = null
-    private var brushProvider: BrushProvider = BrushProvider()
-    private var historyHolder: HistoryHolder? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,28 +35,9 @@ class PaintingFragment : Fragment() {
     ): View {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         topControlsBinding = TopControlsBinding.bind(binding.root)
-        historyHolder = HistoryHolder()
         setUpControls()
+        setUpViewModelListeners()
         return binding.root
-    }
-
-    private fun setUpControls() {
-        with(requireNotNull(topControlsBinding)) {
-            undo.setOnClickListener {
-                previousPicture()?.let { bitmap ->
-                    paintingView?.setBackgroundBitmap(bitmap)
-                }
-            }
-            redo.setOnClickListener {
-                historyHolder?.redoLastAction()?.let { bitmap ->
-                    paintingView?.setBackgroundBitmap(bitmap)
-                }
-            }
-        }
-    }
-
-    private fun previousPicture(): Bitmap? {
-        return historyHolder?.undoLastAction()
     }
 
     override fun onViewCreated(
@@ -60,13 +46,11 @@ class PaintingFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         paintingView = PaintView(requireContext())
-        paintingView?.setPen(brushProvider.pen())
         paintingView?.setDrawingListener(object : PaintView.DrawingListener{
             override fun onDrawingFinished(bitmap: Bitmap) {
-                historyHolder?.addLayer(bitmap)
+                viewModel.addLayer(bitmap)
             }
         })
-        paintingView?.setBackgroundBitmap(getBitmap())
 
         binding.paintingContainer.addView(
             paintingView,
@@ -77,22 +61,72 @@ class PaintingFragment : Fragment() {
         )
     }
 
-    private fun getBitmap(): Bitmap {
-        val bgDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_background, null)
-        val bgBitmap = Bitmap.createBitmap(
-            bgDrawable?.intrinsicWidth ?: 1,
-            bgDrawable?.intrinsicHeight ?: 1,
-            Bitmap.Config.ARGB_8888,
-        )
-        val canvas = Canvas(bgBitmap)
-
-        bgDrawable?.setBounds(0, 0, canvas.width, canvas.height)
-        bgDrawable?.draw(canvas)
-        return bgBitmap
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setUpViewModelListeners() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.pictureState.collect { picture ->
+                   paintingView?.setBackgroundBitmap(picture)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.brushState.collect { brush ->
+                    paintingView?.setPen(brush)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.hasRedoActionsState.collect { hasActions ->
+                    topControlsBinding?.redo?.isEnabled = hasActions
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.hasUndoActionsState.collect { hasActions ->
+                    topControlsBinding?.undo?.isEnabled = hasActions
+                }
+            }
+        }
+    }
+
+    private fun setUpControls() {
+        setUpTopControls()
+        setUpBottomControls()
+    }
+
+    private fun setUpTopControls() {
+        with(requireNotNull(topControlsBinding)) {
+            undo.setOnClickListener {
+                viewModel.undoLastAction()
+            }
+            redo.setOnClickListener {
+                viewModel.redoLastAction()
+            }
+        }
+    }
+
+    private fun setUpBottomControls() {
+        with(binding.bottomControlsContainer) {
+            eraser.setOnClickListener {
+                viewModel.setUpPen(
+                    color = Color.WHITE,
+                    width = 5f,
+                )
+            }
+            colorPicker.setOnClickListener {
+                viewModel.setUpPen(
+                    color = Color.RED,
+                    width = 5f,
+                )
+            }
+        }
     }
 }
