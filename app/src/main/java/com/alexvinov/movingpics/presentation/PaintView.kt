@@ -26,7 +26,8 @@ class PaintView(
     private val path = Path()
     private var pen = Paint()
     private var canvas: Canvas? = null
-    private var curBitmap: Bitmap? = null
+    private var picture: Bitmap? = null
+    private var background: Bitmap? = null
 
     private var drawingListener: DrawingListener? = null
 
@@ -41,7 +42,11 @@ class PaintView(
     }
 
     fun setBackgroundBitmap(bitmap: Bitmap) {
-        curBitmap = bitmap
+        background = bitmap
+    }
+
+    fun setPictureBitmap(bitmap: Bitmap) {
+        picture = bitmap
         canvas = Canvas(bitmap)
     }
 
@@ -70,12 +75,18 @@ class PaintView(
             return
         }
 
-        curBitmap
+        picture
+            ?.let { bitmap ->
+                Bitmap.createScaledBitmap(bitmap, width, height, false)
+            }?.also { bitmap ->
+                setPictureBitmap(bitmap)
+                drawingListener?.onDrawingFinished(bitmap)
+            }
+        background
             ?.let { bitmap ->
                 Bitmap.createScaledBitmap(bitmap, width, height, false)
             }?.also { bitmap ->
                 setBackgroundBitmap(bitmap)
-                drawingListener?.onDrawingFinished(bitmap)
             }
     }
 
@@ -128,7 +139,7 @@ class PaintView(
 
     private fun touchUp() {
         path.reset()
-        curBitmap?.let { bitmap -> drawingListener?.onDrawingFinished(bitmap) }
+        picture?.let { bitmap -> drawingListener?.onDrawingFinished(bitmap) }
     }
 
     override fun run() {
@@ -137,8 +148,11 @@ class PaintView(
 
             val startFrameTime = System.nanoTime()
             holder?.lockCanvas()?.let { canvas ->
-                curBitmap?.let { bitmap ->
+                picture?.let { bitmap ->
                     try {
+                        background?.let { background ->
+                            canvas.drawBitmap(background, 0f, 0f, null)
+                        }
                         canvas.drawBitmap(bitmap, 0f, 0f, null)
                     } catch (err: Throwable) {
                         err.printStackTrace()

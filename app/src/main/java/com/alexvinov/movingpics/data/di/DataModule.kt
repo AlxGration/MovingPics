@@ -1,7 +1,7 @@
 package com.alexvinov.movingpics.data.di
 
 import android.content.Context
-import com.alexvinov.movingpics.data.PictureStorage
+import com.alexvinov.movingpics.data.PictureDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,8 +14,8 @@ import javax.inject.Singleton
 object DataModule {
     @Provides
     @Singleton
-    fun providePictureRepository(
+    fun providePictureDataStore(
         @ApplicationContext appContext: Context,
-    ): PictureStorage = PictureStorage(appContext)
+    ): PictureDataStore = PictureDataStore(appContext)
 
 }

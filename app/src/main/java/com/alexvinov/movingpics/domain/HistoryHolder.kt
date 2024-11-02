@@ -40,4 +40,9 @@ class HistoryHolder @Inject constructor() {
     fun hasUndoActions() = history.size() > 1
 
     fun lastPictureState() = history.last()
+
+    fun clear() {
+        history.clear()
+        historyBackup.clear()
+    }
 }

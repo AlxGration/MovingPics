@@ -1,13 +1,11 @@
 package com.alexvinov.movingpics.presentation
 
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -70,6 +68,13 @@ class PaintingFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.pictureState.collect { picture ->
+                    paintingView?.setPictureBitmap(picture)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.backgroundState.collect { picture ->
                     paintingView?.setBackgroundBitmap(picture)
                 }
             }
@@ -109,6 +114,12 @@ class PaintingFragment : Fragment() {
             }
             redo.setOnClickListener {
                 viewModel.redoLastAction()
+            }
+            newDraft.setOnClickListener {
+                viewModel.addNewPicture()
+            }
+            bin.setOnClickListener {
+                viewModel.removePicture()
             }
         }
     }
