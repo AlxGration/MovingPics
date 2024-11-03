@@ -20,7 +20,7 @@ class PictureDataStore(
     private val currentSize = AtomicLong(0)
     private var lastRemovePicture: Bitmap? = null
 
-    fun initialBackgroundPicture(): Bitmap {
+    suspend fun initialBackgroundPicture(): Bitmap {
         val bgDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_background, null)
         val bgBitmap =
             Bitmap.createBitmap(
@@ -35,16 +35,16 @@ class PictureDataStore(
         return bgBitmap
     }
 
-    fun save(picture: Bitmap) {
+    suspend fun save(picture: Bitmap) {
         lastRemovePicture = null
         saveToInternalStorage(picture)
     }
 
-    fun empty(): Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    suspend fun empty(): Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
-    fun last(): Bitmap? = getPictureFromInternalStorage(currentSize.get()-1)?.copy(Bitmap.Config.ARGB_8888, true)
+    suspend fun last(): Bitmap? = getPictureFromInternalStorage(currentSize.get()-1)?.copy(Bitmap.Config.ARGB_8888, true)
 
-    fun removeLast() {
+    suspend fun removeLast() {
         lastRemovePicture = null
         val picture = removePictureFromInternalStorage(currentSize.get()-1)
         if (picture != null){
@@ -53,7 +53,7 @@ class PictureDataStore(
         }
     }
 
-    fun lastRemovedPicture(): Bitmap? = lastRemovePicture?.copy(Bitmap.Config.ARGB_8888, true)
+    suspend fun lastRemovedPicture(): Bitmap? = lastRemovePicture?.copy(Bitmap.Config.ARGB_8888, true)
 
     fun initPictureSize(
         width: Int,
@@ -65,7 +65,7 @@ class PictureDataStore(
 
     private fun fileName(index: Long) = "draft-$index.png"
 
-    private fun saveToInternalStorage(bitmap: Bitmap) {
+    private suspend  fun saveToInternalStorage(bitmap: Bitmap) {
         val filename = fileName(currentSize.getAndIncrement())
         val file = File(context.filesDir, filename)
         try {
@@ -78,7 +78,7 @@ class PictureDataStore(
         }
     }
 
-    private fun removePictureFromInternalStorage(index: Long): Bitmap? {
+    private suspend fun removePictureFromInternalStorage(index: Long): Bitmap? {
         val filename = fileName(index)
         val file = File(context.filesDir, filename)
         val bitmap = getPictureFromInternalStorage(index)
@@ -89,7 +89,7 @@ class PictureDataStore(
         return bitmap
     }
 
-    private fun getPictureFromInternalStorage(index: Long): Bitmap? {
+    private suspend fun getPictureFromInternalStorage(index: Long): Bitmap? {
         val filename = fileName(index)
         val file = File(context.filesDir, filename)
         if (!file.exists()) return null

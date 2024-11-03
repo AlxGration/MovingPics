@@ -9,17 +9,17 @@ class PictureRepository @Inject constructor(
     private val historyHolder: HistoryHolder,
     private val picturesStore: PictureDataStore,
 ) {
-    fun addLayer(bitmap: Bitmap) = historyHolder.addLayer(bitmap)
+    suspend fun addLayer(bitmap: Bitmap) = historyHolder.addLayer(bitmap)
 
-    fun nextLayer() = historyHolder.redoLastAction()
+    suspend fun nextLayer() = historyHolder.redoLastAction()
 
-    fun previousLayer(): Bitmap {
+    suspend fun previousLayer(): Bitmap {
         return historyHolder.undoLastAction()
             ?: picturesStore.lastRemovedPicture()
             ?: picturesStore.empty()
     }
 
-    fun savePicture(): Boolean {
+    suspend fun savePicture(): Boolean {
         val picture = historyHolder.lastPictureState()
         picture?.let { picture ->
             picturesStore.save(picture)
@@ -28,16 +28,16 @@ class PictureRepository @Inject constructor(
         return picture != null
     }
 
-    fun background(): Bitmap = picturesStore.initialBackgroundPicture()
+    suspend fun background(): Bitmap = picturesStore.initialBackgroundPicture()
 
-    fun emptyPicture() = picturesStore.empty()
+    suspend fun emptyPicture() = picturesStore.empty()
 
-    fun removePicture() {
+    suspend fun removePicture() {
         historyHolder.clear()
         picturesStore.removeLast()
     }
 
-    fun lastOrEmptyPicture(): Bitmap {
+    suspend fun lastOrEmptyPicture(): Bitmap {
         return picturesStore.last() ?: picturesStore.empty()
     }
 
@@ -45,7 +45,7 @@ class PictureRepository @Inject constructor(
 
     fun hasRedoActions() = historyHolder.hasRedoActions()
 
-    fun backgroundWithLastPicture(): Bitmap {
+    suspend fun backgroundWithLastPicture(): Bitmap {
         val background = background()
         return picturesStore.last()?.let {
             background.mergeWith(bitmap = lastOrEmptyPicture(), alpha = 60)

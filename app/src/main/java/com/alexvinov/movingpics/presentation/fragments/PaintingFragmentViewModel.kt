@@ -3,12 +3,16 @@ package com.alexvinov.movingpics.presentation.fragments
 import android.graphics.Bitmap
 import android.graphics.Paint
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.alexvinov.movingpics.domain.BrushProvider
 import com.alexvinov.movingpics.domain.PictureRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,10 +21,14 @@ class PaintingFragmentViewModel @Inject constructor(
     private val pictureRepository: PictureRepository,
 ) : ViewModel() {
 
-    private val _backgroundState = MutableStateFlow(pictureRepository.background())
+    private val _backgroundState = MutableStateFlow(
+        runBlocking { pictureRepository.background() }
+    )
     val backgroundState: StateFlow<Bitmap> = _backgroundState.asStateFlow()
 
-    private val _pictureState = MutableStateFlow(pictureRepository.emptyPicture())
+    private val _pictureState = MutableStateFlow(
+        runBlocking { pictureRepository.emptyPicture() }
+    )
     val pictureState: StateFlow<Bitmap> = _pictureState.asStateFlow()
 
     private val _brushState = MutableStateFlow(brushHolder.pen())
@@ -29,7 +37,7 @@ class PaintingFragmentViewModel @Inject constructor(
     private val _actionButtonState = MutableStateFlow(ControlsButtonsEnableState())
     val actionButtonState: StateFlow<ControlsButtonsEnableState> = _actionButtonState.asStateFlow()
 
-    fun addLayer(bitmap: Bitmap) {
+    fun addLayer(bitmap: Bitmap) = viewModelScope.launch(Dispatchers.Default) {
         pictureRepository.addLayer(bitmap)
         calcEnablingActionButtons()
     }
@@ -38,14 +46,14 @@ class PaintingFragmentViewModel @Inject constructor(
         pictureRepository.initPictureSize(width, height)
     }
 
-    fun redoLastAction() {
+    fun redoLastAction() = viewModelScope.launch(Dispatchers.Default) {
         pictureRepository.nextLayer()?.let { picture ->
             _pictureState.value = picture
         }
         calcEnablingActionButtons()
     }
 
-    fun undoLastAction() {
+    fun undoLastAction() = viewModelScope.launch(Dispatchers.Default) {
         _pictureState.value = pictureRepository.previousLayer()
         calcEnablingActionButtons()
     }
@@ -59,11 +67,11 @@ class PaintingFragmentViewModel @Inject constructor(
         _brushState.value = brushHolder.pen()
     }
 
-    fun pickEraser(){
+    fun pickEraser() {
         _brushState.value = brushHolder.eraser()
     }
 
-    fun addNewPicture() {
+    fun addNewPicture() = viewModelScope.launch(Dispatchers.Default) {
         if(!pictureRepository.isHistoryEmpty()) {
             if (pictureRepository.savePicture()) {
                 _backgroundState.value = pictureRepository.backgroundWithLastPicture()
@@ -73,7 +81,7 @@ class PaintingFragmentViewModel @Inject constructor(
         }
     }
 
-    fun removePicture() {
+    fun removePicture() = viewModelScope.launch(Dispatchers.Default) {
         _pictureState.value = pictureRepository.lastOrEmptyPicture()
         pictureRepository.removePicture()
         _backgroundState.value = pictureRepository.backgroundWithLastPicture()
