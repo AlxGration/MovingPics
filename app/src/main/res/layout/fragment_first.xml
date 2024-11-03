@@ -12,7 +12,7 @@
     tools:context=".presentation.PaintingFragment">
 
     <include
-        layout="@layout/top_controls"
+        layout="@layout/view_controls_top"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,9 +28,19 @@
         app:layout_constraintBottom_toTopOf="@id/bottom_controls"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.alexvinov.movingpics.presentation.ControlColorView
+        android:id="@+id/view_control_color"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottom_controls_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <include
         android:id="@+id/bottom_controls_container"
-        layout="@layout/bottom_controls"
+        layout="@layout/view_controls_bottom"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         app:layout_constraintBottom_toBottomOf="parent"

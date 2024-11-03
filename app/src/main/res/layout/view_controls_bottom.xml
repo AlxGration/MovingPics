@@ -30,6 +30,8 @@
         android:layout_height="32dp"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="16dp"
-        android:background="@color/transparent"
-        android:src="@drawable/ic_ball" />
+        android:padding="2dp"
+        android:background="@drawable/shape_ball"
+        android:backgroundTint="@color/grey"
+        android:src="@drawable/shape_ball"/>
 </LinearLayout>

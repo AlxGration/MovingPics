@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/controls_floating_background"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/color_white"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="2dp"
+        android:src="@drawable/shape_ball"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/color_red"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:padding="2dp"
+        android:src="@drawable/shape_ball"
+        app:tint="@color/red" />
+
+    <ImageView
+        android:id="@+id/color_black"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:padding="2dp"
+        android:src="@drawable/shape_ball"
+        app:tint="@color/black" />
+
+    <ImageView
+        android:id="@+id/color_blue"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:padding="2dp"
+        android:src="@drawable/shape_ball"
+        app:tint="@color/blue" />
+
+</merge>

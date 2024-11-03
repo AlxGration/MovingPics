@@ -13,7 +13,7 @@ class BrushProvider @Inject constructor() {
     init {
         pen.style = Paint.Style.STROKE
         pen.isAntiAlias = true
-        setUpPen(color = Color.RED)
+        setUpPen(color = Color.BLACK)
 
         eraser.style = Paint.Style.STROKE
         eraser.isAntiAlias = true
