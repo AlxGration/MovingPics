@@ -3,6 +3,11 @@ package com.alexvinov.movingpics.domain
 import android.graphics.Bitmap
 import com.alexvinov.movingpics.data.PictureDataStore
 import com.alexvinov.movingpics.utils.BitmapUtils.mergeWith
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class PictureRepository @Inject constructor(
@@ -41,6 +46,25 @@ class PictureRepository @Inject constructor(
         return picturesStore.last() ?: picturesStore.empty()
     }
 
+    suspend fun startAnimationFlow(): Flow<Bitmap?> {
+        if (picturesStore.picturesSize() < 1) return emptyFlow()
+
+        IS_ANIMATION_PLAYING.set(true)
+        return flow {
+            while (IS_ANIMATION_PLAYING.get()) {
+                for (index in 0 until picturesStore.picturesSize()) {
+                    emit(picturesStore.getPictureFromInternalStorage(index))
+                    delay(ANIMATION_DELAY_MILLIS)
+                }
+            }
+        }
+    }
+
+    suspend fun stopAnimationFlow() {
+        IS_ANIMATION_PLAYING.set(false)
+        restoreStateAfterAnimation()
+    }
+
     fun isHistoryEmpty(): Boolean = !historyHolder.hasUndoActions()
 
     fun hasRedoActions() = historyHolder.hasRedoActions()
@@ -54,5 +78,24 @@ class PictureRepository @Inject constructor(
 
     fun initPictureSize(width: Int, height: Int) {
         picturesStore.initPictureSize(width, height)
+    }
+
+    suspend fun saveCurrentStateBeforeAnimation() {
+        // сохраняем нарисованное, но не сохраненное
+        if (!savePicture()) {
+            // если сохранять нечего, то сохраним пустое изображение
+            // (чтобы после анимации вернуться на то же состояние, как перед запуском)
+            picturesStore.save(picturesStore.empty())
+        }
+    }
+
+    suspend fun restoreStateAfterAnimation() {
+        // тк перед началом анимации сохраняли текущий кадр, то востановим его
+        removePicture()
+    }
+
+    companion object {
+        private const val ANIMATION_DELAY_MILLIS = 500L
+        private val IS_ANIMATION_PLAYING = AtomicBoolean(false)
     }
 }

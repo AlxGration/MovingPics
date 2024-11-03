@@ -20,6 +20,8 @@ class PictureDataStore(
     private val currentSize = AtomicLong(0)
     private var lastRemovePicture: Bitmap? = null
 
+    fun picturesSize() = currentSize.get()
+
     suspend fun initialBackgroundPicture(): Bitmap {
         val bgDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_background, null)
         val bgBitmap =
@@ -55,17 +57,35 @@ class PictureDataStore(
 
     suspend fun lastRemovedPicture(): Bitmap? = lastRemovePicture?.copy(Bitmap.Config.ARGB_8888, true)
 
-    fun initPictureSize(
-        width: Int,
-        height: Int,
-    ) {
+    fun initPictureSize(width: Int, height: Int) {
         this.width = width
         this.height = height
     }
 
-    private fun fileName(index: Long) = "draft-$index.png"
+    suspend fun removePictureFromInternalStorage(index: Long): Bitmap? {
+        val filename = fileName(index)
+        val file = File(context.filesDir, filename)
+        val bitmap = getPictureFromInternalStorage(index)
+        if (file.exists()) {
+            file.delete()
+        }
 
-    private suspend  fun saveToInternalStorage(bitmap: Bitmap) {
+        return bitmap
+    }
+
+    suspend fun getPictureFromInternalStorage(index: Long): Bitmap? {
+        val filename = fileName(index)
+        val file = File(context.filesDir, filename)
+        if (!file.exists()) return null
+        return try {
+            FileInputStream(file).use { ios -> BitmapFactory.decodeStream(ios).copy(Bitmap.Config.ARGB_8888, true) }
+        } catch (err: Throwable) {
+            err.printStackTrace()
+            null
+        }
+    }
+
+    private suspend fun saveToInternalStorage(bitmap: Bitmap) {
         val filename = fileName(currentSize.getAndIncrement())
         val file = File(context.filesDir, filename)
         try {
@@ -78,26 +98,5 @@ class PictureDataStore(
         }
     }
 
-    private suspend fun removePictureFromInternalStorage(index: Long): Bitmap? {
-        val filename = fileName(index)
-        val file = File(context.filesDir, filename)
-        val bitmap = getPictureFromInternalStorage(index)
-        if (file.exists()) {
-            file.delete()
-        }
-
-        return bitmap
-    }
-
-    private suspend fun getPictureFromInternalStorage(index: Long): Bitmap? {
-        val filename = fileName(index)
-        val file = File(context.filesDir, filename)
-        if (!file.exists()) return null
-        return try {
-            FileInputStream(file).use { ios -> BitmapFactory.decodeStream(ios) }
-        } catch (err: Throwable) {
-            err.printStackTrace()
-            null
-        }
-    }
+    private fun fileName(index: Long) = "draft-$index.png"
 }

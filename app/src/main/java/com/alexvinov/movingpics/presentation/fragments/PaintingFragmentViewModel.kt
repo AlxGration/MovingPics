@@ -8,6 +8,7 @@ import com.alexvinov.movingpics.domain.BrushProvider
 import com.alexvinov.movingpics.domain.PictureRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,7 +64,7 @@ class PaintingFragmentViewModel @Inject constructor(
         _brushState.value = brushHolder.pen()
     }
 
-    fun pickPen(){
+    fun pickPen() {
         _brushState.value = brushHolder.pen()
     }
 
@@ -86,6 +87,24 @@ class PaintingFragmentViewModel @Inject constructor(
         pictureRepository.removePicture()
         _backgroundState.value = pictureRepository.backgroundWithLastPicture()
         calcEnablingActionButtons()
+    }
+
+    fun playAnimation() = viewModelScope.launch(Dispatchers.Default) {
+        pictureRepository.saveCurrentStateBeforeAnimation()
+        _backgroundState.value = pictureRepository.background()
+        pictureRepository.startAnimationFlow().collect { picture ->
+            picture?.let { picture ->
+                _pictureState.value = picture
+            }
+        }
+    }
+
+    fun stopAnimation() = viewModelScope.launch(Dispatchers.Default) {
+        pictureRepository.stopAnimationFlow()
+        delay(500)
+        pictureRepository.restoreStateAfterAnimation()
+        _pictureState.value = pictureRepository.previousLayer()
+        _backgroundState.value = pictureRepository.backgroundWithLastPicture()
     }
 
     private fun calcEnablingActionButtons() {

@@ -120,6 +120,12 @@ class PaintingFragment : Fragment() {
             removePicture.setOnClickListener {
                 viewModel.removePicture()
             }
+            play.setOnClickListener {
+                viewModel.playAnimation()
+            }
+            stop.setOnClickListener {
+                viewModel.stopAnimation()
+            }
         }
     }
 
