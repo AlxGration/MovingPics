@@ -1,4 +1,4 @@
-package com.alexvinov.movingpics.presentation
+package com.alexvinov.movingpics.presentation.fragments
 
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,13 +14,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.alexvinov.movingpics.databinding.FragmentFirstBinding
 import com.alexvinov.movingpics.databinding.ViewControlsTopBinding
+import com.alexvinov.movingpics.presentation.views.ControlColorView
+import com.alexvinov.movingpics.presentation.views.PaintView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class PaintingFragment : Fragment() {
     private var _binding: FragmentFirstBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = requireNotNull(_binding) { "binding should not be bull" }
     private var topControlsBinding: ViewControlsTopBinding? = null
         get() {
             if (field == null) field = ViewControlsTopBinding.bind(binding.root)
@@ -29,8 +30,6 @@ class PaintingFragment : Fragment() {
         }
 
     private val viewModel: PaintingFragmentViewModel by viewModels()
-
-    private var paintingView: PaintView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,8 +47,7 @@ class PaintingFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        paintingView = PaintView(requireContext())
-        paintingView?.setDrawingListener(object : PaintView.DrawingListener{
+        binding.viewPaint.setDrawingListener(object : PaintView.DrawingListener {
             override fun onDrawingFinished(bitmap: Bitmap) {
                 viewModel.addLayer(bitmap)
             }
@@ -58,19 +56,11 @@ class PaintingFragment : Fragment() {
                 viewModel.initPictureSize(width, height)
             }
         })
-
-        binding.paintingContainer.addView(
-            paintingView,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-            ),
-        )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        paintingView?.setDrawingListener(null)
+        binding.viewPaint.setDrawingListener(null)
         binding.viewControlColor.setColorSelectedListener(null)
         _binding = null
         topControlsBinding = null
@@ -80,36 +70,31 @@ class PaintingFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.pictureState.collect { picture ->
-                    paintingView?.setPictureBitmap(picture)
+                    binding.viewPaint.setPictureBitmap(picture)
                 }
             }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.backgroundState.collect { picture ->
-                    paintingView?.setBackgroundBitmap(picture)
+                    binding.viewPaint.setBackgroundBitmap(picture)
                 }
             }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.brushState.collect { brush ->
-                    paintingView?.setPen(brush)
+                    binding.viewPaint.setPen(brush)
                     binding.bottomControlsContainer.colorPicker.imageTintList = ColorStateList.valueOf(brush.color)
                 }
             }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.hasRedoActionsState.collect { hasActions ->
-                    topControlsBinding?.redo?.isEnabled = hasActions
-                }
-            }
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.hasUndoActionsState.collect { hasActions ->
-                    topControlsBinding?.undo?.isEnabled = hasActions
+                viewModel.actionButtonState.collect { buttonsState ->
+                    topControlsBinding?.redo?.isEnabled = buttonsState.isRedoEnabled
+                    topControlsBinding?.undo?.isEnabled = buttonsState.isUndoEnabled
+                    topControlsBinding?.newPicture?.isEnabled = buttonsState.isNewPictureEnabled
                 }
             }
         }

@@ -9,7 +9,7 @@
     android:paddingHorizontal="16dp"
     android:paddingVertical="16dp"
     android:theme="@style/Base.Theme.MovingPics"
-    tools:context=".presentation.PaintingFragment">
+    tools:context=".presentation.fragments.PaintingFragment">
 
     <include
         layout="@layout/view_controls_top"
@@ -19,8 +19,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <FrameLayout
-        android:id="@+id/painting_container"
+
+    <com.alexvinov.movingpics.presentation.views.PaintView
+        android:id="@+id/view_paint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="64dp"
@@ -28,7 +29,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottom_controls"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.alexvinov.movingpics.presentation.ControlColorView
+    <com.alexvinov.movingpics.presentation.views.ControlColorView
         android:id="@+id/view_control_color"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"

@@ -31,6 +31,7 @@ class PictureDataStore(
 
     fun save(picture: Bitmap) {
         last = picture
+        lastRemovePicture = null
     }
 
     fun empty(): Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)

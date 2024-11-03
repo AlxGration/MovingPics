@@ -1,4 +1,4 @@
-package com.alexvinov.movingpics.presentation
+package com.alexvinov.movingpics.presentation.fragments
 
 import android.graphics.Bitmap
 import android.graphics.Paint
@@ -26,15 +26,12 @@ class PaintingFragmentViewModel @Inject constructor(
     private val _brushState = MutableStateFlow(brushHolder.pen())
     val brushState: StateFlow<Paint> = _brushState.asStateFlow()
 
-    private val _hasUndoActionsState = MutableStateFlow(false)
-    val hasUndoActionsState: StateFlow<Boolean> = _hasUndoActionsState.asStateFlow()
-
-    private val _hasRedoActionsState = MutableStateFlow(false)
-    val hasRedoActionsState: StateFlow<Boolean> = _hasRedoActionsState.asStateFlow()
+    private val _actionButtonState = MutableStateFlow(ControlsButtonsEnableState())
+    val actionButtonState: StateFlow<ControlsButtonsEnableState> = _actionButtonState.asStateFlow()
 
     fun addLayer(bitmap: Bitmap) {
         pictureRepository.addLayer(bitmap)
-        setEnablingUndoRedoActions()
+        calcEnablingActionButtons()
     }
 
     fun initPictureSize(width: Int, height: Int) {
@@ -45,12 +42,12 @@ class PaintingFragmentViewModel @Inject constructor(
         pictureRepository.nextLayer()?.let { picture ->
             _pictureState.value = picture
         }
-        setEnablingUndoRedoActions()
+        calcEnablingActionButtons()
     }
 
     fun undoLastAction() {
         _pictureState.value = pictureRepository.previousLayer()
-        setEnablingUndoRedoActions()
+        calcEnablingActionButtons()
     }
 
     fun setUpPen(color: Int, width: Float) {
@@ -71,7 +68,7 @@ class PaintingFragmentViewModel @Inject constructor(
             if (pictureRepository.savePicture()) {
                 _backgroundState.value = pictureRepository.backgroundWithLastPicture()
                 _pictureState.value = pictureRepository.emptyPicture()
-                setEnablingUndoRedoActions()
+                calcEnablingActionButtons()
             }
         }
     }
@@ -80,11 +77,15 @@ class PaintingFragmentViewModel @Inject constructor(
         _pictureState.value = pictureRepository.lastOrEmptyPicture()
         pictureRepository.removePicture()
         _backgroundState.value = pictureRepository.backgroundWithLastPicture()
-        setEnablingUndoRedoActions()
+        calcEnablingActionButtons()
     }
 
-    private fun setEnablingUndoRedoActions() {
-        _hasRedoActionsState.value = pictureRepository.hasRedoActions()
-        _hasUndoActionsState.value = !pictureRepository.isHistoryEmpty()
+    private fun calcEnablingActionButtons() {
+        val hasActionsHistory = !pictureRepository.isHistoryEmpty()
+        _actionButtonState.value = ControlsButtonsEnableState(
+            isUndoEnabled = hasActionsHistory,
+            isRedoEnabled = pictureRepository.hasRedoActions(),
+            isNewPictureEnabled = hasActionsHistory
+        )
     }
 }

@@ -1,4 +1,4 @@
-package com.alexvinov.movingpics.presentation
+package com.alexvinov.movingpics.presentation.views
 
 import android.content.Context
 import android.graphics.Color
@@ -15,7 +15,7 @@ import com.alexvinov.movingpics.utils.toDp
 
 class ControlColorView(
     private val context: Context,
-    private val attrs: AttributeSet?,
+    private val attrs: AttributeSet? = null,
 ) : LinearLayout(context, attrs) {
 
     private val binding = ViewControlColorsBinding.inflate(LayoutInflater.from(context), this)

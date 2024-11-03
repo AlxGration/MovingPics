@@ -1,10 +1,11 @@
-package com.alexvinov.movingpics.presentation
+package com.alexvinov.movingpics.presentation.views
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -12,8 +13,9 @@ import android.view.View
 import java.util.concurrent.atomic.AtomicBoolean
 
 class PaintView(
-    context: Context,
-) : SurfaceView(context),
+    private val context: Context,
+    private val attrs: AttributeSet? = null,
+) : SurfaceView(context, attrs),
     SurfaceHolder.Callback,
     View.OnTouchListener,
     Runnable {

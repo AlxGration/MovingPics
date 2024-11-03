@@ -45,7 +45,8 @@
         android:background="@color/transparent"
         android:src="@drawable/ic_add_sheet"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="@color/color_state_selector"/>
 
     <ImageButton
         android:id="@+id/stop"
