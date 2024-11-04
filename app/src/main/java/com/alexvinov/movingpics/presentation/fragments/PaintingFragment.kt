@@ -96,6 +96,7 @@ class PaintingFragment : Fragment() {
                     topControlsBinding?.undo?.isEnabled = buttonsState.isUndoEnabled
                     topControlsBinding?.newPicture?.isEnabled = buttonsState.isNewPictureEnabled
                     topControlsBinding?.removePicture?.isEnabled = !buttonsState.isAnimationPlaying
+                    topControlsBinding?.copyPicture?.isEnabled = !buttonsState.isAnimationPlaying
                     topControlsBinding?.play?.isEnabled = !buttonsState.isAnimationPlaying
                     topControlsBinding?.stop?.isEnabled = buttonsState.isAnimationPlaying
                     binding.viewPaint.setIsDrawingAllowed(!buttonsState.isAnimationPlaying)
@@ -127,6 +128,9 @@ class PaintingFragment : Fragment() {
             }
             removePicture.setOnClickListener {
                 viewModel.removePicture()
+            }
+            copyPicture.setOnClickListener {
+                viewModel.copyPicture()
             }
             play.setOnClickListener {
                 viewModel.playAnimation()

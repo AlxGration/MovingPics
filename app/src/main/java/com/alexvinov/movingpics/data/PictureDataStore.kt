@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicLong
 class PictureDataStore(
     private val context: Context,
 ) {
-    private var width = 1
-    private var height = 1
+    private var width:Int? = null
+    private var height:Int? = null
     private val currentSize = AtomicLong(0)
     private var lastRemovePicture: Bitmap? = null
 
@@ -26,8 +26,8 @@ class PictureDataStore(
         val bgDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_background, null)
         val bgBitmap =
             Bitmap.createBitmap(
-                bgDrawable?.intrinsicWidth ?: width,
-                bgDrawable?.intrinsicHeight ?: height,
+                width ?: bgDrawable?.intrinsicWidth ?: 1,
+                height ?: bgDrawable?.intrinsicHeight ?: 1,
                 Bitmap.Config.ARGB_8888,
             )
         val canvas = Canvas(bgBitmap)
@@ -42,7 +42,7 @@ class PictureDataStore(
         saveToInternalStorage(picture)
     }
 
-    suspend fun empty(): Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    suspend fun empty(): Bitmap = Bitmap.createBitmap(width ?: 1, height ?: 1, Bitmap.Config.ARGB_8888)
 
     suspend fun last(): Bitmap? = getPictureFromInternalStorage(currentSize.get()-1)?.copy(Bitmap.Config.ARGB_8888, true)
 
@@ -78,7 +78,15 @@ class PictureDataStore(
         val file = File(context.filesDir, filename)
         if (!file.exists()) return null
         return try {
-            FileInputStream(file).use { ios -> BitmapFactory.decodeStream(ios).copy(Bitmap.Config.ARGB_8888, true) }
+            FileInputStream(file).use { ios ->
+                val picture = BitmapFactory.decodeStream(ios)
+                Bitmap.createScaledBitmap(
+                    picture,
+                    width ?: picture.width,
+                    height ?: picture.height,
+                    false
+                ).copy(Bitmap.Config.ARGB_8888, true)
+            }
         } catch (err: Throwable) {
             err.printStackTrace()
             null

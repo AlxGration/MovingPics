@@ -28,20 +28,20 @@
 
     <ImageButton
         android:id="@+id/remove_picture"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center_vertical"
         android:background="@color/transparent"
         android:src="@drawable/ic_bin"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toStartOf="@id/new_picture"
         app:tint="@color/color_state_selector" />
 
     <ImageButton
         android:id="@+id/new_picture"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="16dp"
         android:background="@color/transparent"
         android:src="@drawable/ic_add_sheet"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,9 +49,20 @@
         app:tint="@color/color_state_selector"/>
 
     <ImageButton
+        android:id="@+id/copy_picture"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
+        android:background="@color/transparent"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_copy"
+        app:layout_constraintStart_toEndOf="@id/new_picture"
+        app:tint="@color/color_state_selector" />
+
+    <ImageButton
         android:id="@+id/stop"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="16dp"
         android:background="@color/transparent"
@@ -61,8 +72,8 @@
 
     <ImageButton
         android:id="@+id/play"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center_vertical"
         android:background="@color/transparent"
         android:src="@drawable/ic_play"

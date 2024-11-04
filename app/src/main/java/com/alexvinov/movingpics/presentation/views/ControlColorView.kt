@@ -17,7 +17,6 @@ class ControlColorView(
     private val context: Context,
     private val attrs: AttributeSet? = null,
 ) : LinearLayout(context, attrs) {
-
     private val binding = ViewControlColorsBinding.inflate(LayoutInflater.from(context), this)
     private var colorSelectedListener: OnColorSelectedListener? = null
 
@@ -30,6 +29,7 @@ class ControlColorView(
 
         initColorsListeners()
     }
+
     fun setColorSelectedListener(listener: OnColorSelectedListener?) { colorSelectedListener = listener }
 
     private fun initColorsListeners() {

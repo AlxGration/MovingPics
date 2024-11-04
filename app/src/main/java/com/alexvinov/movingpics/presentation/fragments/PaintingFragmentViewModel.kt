@@ -76,7 +76,6 @@ class PaintingFragmentViewModel @Inject constructor(
         if (pictureRepository.savePicture()) {
             _backgroundState.value = pictureRepository.backgroundWithLastPicture()
             _pictureState.value = pictureRepository.emptyPicture()
-            calcEnablingActionButtons()
         }
     }
 
@@ -85,6 +84,14 @@ class PaintingFragmentViewModel @Inject constructor(
         pictureRepository.removePicture()
         _backgroundState.value = pictureRepository.backgroundWithLastPicture()
         calcEnablingActionButtons()
+    }
+
+    fun copyPicture() = viewModelScope.launch(Dispatchers.Default) {
+        if (pictureRepository.savePicture()) {
+            _backgroundState.value = pictureRepository.backgroundWithLastPicture()
+            addLayer(pictureRepository.lastOrEmptyPicture())
+            calcEnablingActionButtons()
+        }
     }
 
     fun playAnimation() = viewModelScope.launch(Dispatchers.Default) {
