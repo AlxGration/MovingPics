@@ -60,10 +60,9 @@ class PictureRepository @Inject constructor(
         }
     }
 
-    suspend fun stopAnimationFlow() {
-        IS_ANIMATION_PLAYING.set(false)
-        restoreStateAfterAnimation()
-    }
+    fun stopAnimationFlow() = IS_ANIMATION_PLAYING.set(false)
+
+    fun isAnimationPlaying() = IS_ANIMATION_PLAYING.get()
 
     fun isHistoryEmpty(): Boolean = !historyHolder.hasUndoActions()
 
@@ -90,7 +89,7 @@ class PictureRepository @Inject constructor(
     }
 
     suspend fun restoreStateAfterAnimation() {
-        // тк перед началом анимации сохраняли текущий кадр, то востановим его
+        // тк перед началом анимации сохраняли текущий кадр в стор, то востановим его
         removePicture()
     }
 

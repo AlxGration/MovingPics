@@ -22,8 +22,9 @@ class PaintView(
     private var holder: SurfaceHolder? = null
     private var drawThread: Thread? = null
 
-    private var surfaceReady = AtomicBoolean(false)
-    private var drawingActive = AtomicBoolean(false)
+    private var isSurfaceReady = AtomicBoolean(false)
+    private var isDrawingActive = AtomicBoolean(false)
+    private var isUserDrawingAllowed = AtomicBoolean(false)
 
     private val path = Path()
     private var pen = Paint()
@@ -55,7 +56,7 @@ class PaintView(
     override fun surfaceCreated(holder: SurfaceHolder) {
         this.holder = holder
         drawThread?.let { thread ->
-            drawingActive.set(false)
+            isDrawingActive.set(false)
             try {
                 thread.join()
             } catch (err: Throwable) {
@@ -63,7 +64,7 @@ class PaintView(
             }
         }
 
-        surfaceReady.set(true)
+        isSurfaceReady.set(true)
         startDrawing()
     }
 
@@ -96,13 +97,14 @@ class PaintView(
         stopDrawing()
         this.holder?.surface?.release()
         this.holder = null
-        surfaceReady.set(false)
+        isSurfaceReady.set(false)
     }
 
     override fun onTouch(
         view: View?,
         event: MotionEvent?,
     ): Boolean {
+        if (!isUserDrawingAllowed.get()) return false
         event ?: return false
         val x = event.x
         val y = event.y
@@ -145,7 +147,7 @@ class PaintView(
     }
 
     override fun run() {
-        while (drawingActive.get()) {
+        while (isDrawingActive.get()) {
             holder ?: return
 
             val startFrameTime = System.nanoTime()
@@ -175,10 +177,14 @@ class PaintView(
         }
     }
 
+    fun setIsDrawingAllowed(isDrawingAllowed: Boolean) {
+        isUserDrawingAllowed.set(isDrawingAllowed)
+    }
+
     private fun stopDrawing() {
         drawThread ?: return
         drawThread?.let { thread ->
-            drawingActive.set(false)
+            isDrawingActive.set(false)
             while (true) {
                 try {
                     thread.join(WAITING_THREAD_MILLIS)
@@ -192,9 +198,9 @@ class PaintView(
     }
 
     private fun startDrawing() {
-        if (surfaceReady.get() && drawThread == null) {
+        if (isSurfaceReady.get() && drawThread == null) {
             drawThread = Thread(this)
-            drawingActive.set(true)
+            isDrawingActive.set(true)
             drawThread?.start()
         }
     }

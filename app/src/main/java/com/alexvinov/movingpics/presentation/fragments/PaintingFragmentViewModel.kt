@@ -92,6 +92,7 @@ class PaintingFragmentViewModel @Inject constructor(
     fun playAnimation() = viewModelScope.launch(Dispatchers.Default) {
         pictureRepository.saveCurrentStateBeforeAnimation()
         _backgroundState.value = pictureRepository.background()
+        calcEnablingActionButtons(isInAnimation = true)
         pictureRepository.startAnimationFlow().collect { picture ->
             picture?.let { picture ->
                 _pictureState.value = picture
@@ -105,14 +106,16 @@ class PaintingFragmentViewModel @Inject constructor(
         pictureRepository.restoreStateAfterAnimation()
         _pictureState.value = pictureRepository.previousLayer()
         _backgroundState.value = pictureRepository.backgroundWithLastPicture()
+        calcEnablingActionButtons(isInAnimation = false)
     }
 
-    private fun calcEnablingActionButtons() {
+    private fun calcEnablingActionButtons(isInAnimation: Boolean = false) {
         val hasActionsHistory = !pictureRepository.isHistoryEmpty()
         _actionButtonState.value = ControlsButtonsEnableState(
-            isUndoEnabled = hasActionsHistory,
-            isRedoEnabled = pictureRepository.hasRedoActions(),
-            isNewPictureEnabled = hasActionsHistory
+            isUndoEnabled = hasActionsHistory && !isInAnimation,
+            isRedoEnabled = pictureRepository.hasRedoActions() && !isInAnimation,
+            isNewPictureEnabled = hasActionsHistory && !isInAnimation,
+            isAnimationPlaying = isInAnimation,
         )
     }
 }

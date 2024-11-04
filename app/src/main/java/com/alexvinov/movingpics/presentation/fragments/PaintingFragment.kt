@@ -95,6 +95,14 @@ class PaintingFragment : Fragment() {
                     topControlsBinding?.redo?.isEnabled = buttonsState.isRedoEnabled
                     topControlsBinding?.undo?.isEnabled = buttonsState.isUndoEnabled
                     topControlsBinding?.newPicture?.isEnabled = buttonsState.isNewPictureEnabled
+                    topControlsBinding?.removePicture?.isEnabled = !buttonsState.isAnimationPlaying
+                    topControlsBinding?.play?.isEnabled = !buttonsState.isAnimationPlaying
+                    topControlsBinding?.stop?.isEnabled = buttonsState.isAnimationPlaying
+                    binding.viewPaint.setIsDrawingAllowed(!buttonsState.isAnimationPlaying)
+                    binding.bottomControlsContainer.root.isVisible = !buttonsState.isAnimationPlaying
+                    if (binding.viewControlColor.isVisible && buttonsState.isAnimationPlaying){
+                        binding.viewControlColor.isVisible = false
+                    }
                 }
             }
         }
