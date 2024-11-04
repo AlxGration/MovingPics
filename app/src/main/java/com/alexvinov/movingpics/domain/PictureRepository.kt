@@ -46,6 +46,10 @@ class PictureRepository @Inject constructor(
         return picturesStore.last() ?: picturesStore.empty()
     }
 
+    suspend fun lastRemovedOrEmptyPicture(): Bitmap {
+        return picturesStore.lastRemovedPicture() ?: picturesStore.empty()
+    }
+
     suspend fun startAnimationFlow(): Flow<Bitmap?> {
         if (picturesStore.picturesSize() < 1) return emptyFlow()
 
@@ -84,9 +88,13 @@ class PictureRepository @Inject constructor(
         savePicture()
     }
 
-    suspend fun restoreStateAfterAnimation() {
+    suspend fun restoreStateAfterAnimation(): Bitmap {
+        // delay для того, чтобы flow анимации  наверняка завершился и не запушил кадр поверх
+        delay(600)
         // тк перед началом анимации сохраняли текущий кадр в стор, то востановим его для рисования
         removePicture()
+
+        return previousLayer()
     }
 
     companion object {

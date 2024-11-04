@@ -111,9 +111,7 @@ class PaintingFragmentViewModel @Inject constructor(
 
     fun stopAnimation() = viewModelScope.launch(Dispatchers.Default) {
         pictureRepository.stopAnimationFlow()
-        delay(500)
-        pictureRepository.restoreStateAfterAnimation()
-        _pictureState.value = pictureRepository.previousLayer()
+        _pictureState.value = pictureRepository.restoreStateAfterAnimation()
         _backgroundState.value = pictureRepository.backgroundWithLastPicture()
         calcEnablingActionButtons(isInAnimation = false)
     }
