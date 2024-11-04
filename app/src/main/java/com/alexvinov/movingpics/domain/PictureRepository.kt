@@ -20,12 +20,12 @@ class PictureRepository @Inject constructor(
 
     suspend fun previousLayer(): Bitmap {
         return historyHolder.undoLastAction()
-            ?: picturesStore.lastRemovedPicture()
             ?: picturesStore.empty()
     }
 
     suspend fun savePicture(): Boolean {
-        val picture = historyHolder.lastPictureState() ?: picturesStore.lastRemovedPicture()
+        // последнее состояние из истории действий
+        val picture = historyHolder.lastPictureState() ?: return false
         picture?.let { picture ->
             picturesStore.save(picture)
             historyHolder.clear()
@@ -39,15 +39,13 @@ class PictureRepository @Inject constructor(
 
     suspend fun removePicture() {
         historyHolder.clear()
+        // добавляем в историю операций
+        picturesStore.last()?.let { picture -> historyHolder.addLayer(picture) }
         picturesStore.removeLast()
     }
 
     suspend fun lastOrEmptyPicture(): Bitmap {
         return picturesStore.last() ?: picturesStore.empty()
-    }
-
-    suspend fun lastRemovedOrEmptyPicture(): Bitmap {
-        return picturesStore.lastRemovedPicture() ?: picturesStore.empty()
     }
 
     suspend fun startAnimationFlow(): Flow<Bitmap?> {
@@ -93,8 +91,11 @@ class PictureRepository @Inject constructor(
         delay(600)
         // тк перед началом анимации сохраняли текущий кадр в стор, то востановим его для рисования
         removePicture()
+        val picture = picturesStore.lastRemovedPicture() ?: picturesStore.empty()
 
-        return previousLayer()
+        // добавляем в историю операций
+        addLayer(picture)
+        return picture
     }
 
     companion object {

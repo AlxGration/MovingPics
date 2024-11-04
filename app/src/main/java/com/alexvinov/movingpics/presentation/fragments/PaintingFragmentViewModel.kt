@@ -77,6 +77,7 @@ class PaintingFragmentViewModel @Inject constructor(
             _backgroundState.value = pictureRepository.backgroundWithLastPicture()
             _pictureState.value = pictureRepository.emptyPicture()
         }
+        calcEnablingActionButtons()
     }
 
     fun removePicture() = viewModelScope.launch(Dispatchers.Default) {
