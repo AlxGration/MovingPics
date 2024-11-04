@@ -64,6 +64,7 @@ class PaintingFragment : Fragment() {
         super.onDestroyView()
         binding.viewPaint.setDrawingListener(null)
         binding.viewControlColor.setColorSelectedListener(null)
+        binding.viewControlBrushSize.setBrushWidthChangedListener(null)
         _binding = null
         topControlsBinding = null
     }
@@ -86,7 +87,7 @@ class PaintingFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.brushState.collect { brush ->
-                    binding.viewPaint.setPen(brush)
+                    binding.viewPaint.setBrush(brush)
                     binding.bottomControlsContainer.colorPicker.imageTintList = ColorStateList.valueOf(brush.color)
                 }
             }
@@ -133,6 +134,7 @@ class PaintingFragment : Fragment() {
             }
             removePicture.setOnClickListener {
                 viewModel.removePicture()
+                Toast.makeText(requireContext(), "Layer removed", Toast.LENGTH_SHORT).show()
             }
             copyPicture.setOnClickListener {
                 viewModel.copyPicture()
@@ -170,13 +172,13 @@ class PaintingFragment : Fragment() {
         with(binding) {
             viewControlColor.setColorSelectedListener(object : ControlColorView.OnColorSelectedListener {
                 override fun onColorSelected(color: Int) {
-                    viewModel.setUpPen(color, 10f)
+                    viewModel.setUpBrush(color = color)
                     bottomControlsContainer.colorPicker.imageTintList = ColorStateList.valueOf(color)
                 }
             })
             viewControlBrushSize.setBrushWidthChangedListener(object : ControlBrushSizeView.OnBrushWidthChangedListener {
                 override fun onBrushWidthChanged(width: Float) {
-                    viewModel.setUpBrushWidth(width)
+                    viewModel.setUpBrush(width = width)
                 }
             })
         }

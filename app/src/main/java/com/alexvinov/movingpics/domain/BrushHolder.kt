@@ -6,7 +6,7 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import javax.inject.Inject
 
-class BrushProvider @Inject constructor() {
+class BrushHolder @Inject constructor() {
     private val pen = Paint()
     private val eraser = Paint()
 
@@ -14,7 +14,7 @@ class BrushProvider @Inject constructor() {
         pen.style = Paint.Style.STROKE
         pen.isAntiAlias = true
         pen.strokeJoin = Paint.Join.ROUND
-        setUpPen(color = Color.BLACK)
+        setUpBrush()
 
         eraser.style = Paint.Style.STROKE
         eraser.isAntiAlias = true
@@ -25,15 +25,11 @@ class BrushProvider @Inject constructor() {
         eraser.strokeJoin = Paint.Join.ROUND
     }
 
-    fun setUpPen(
-        color: Int,
-        width: Float = 10f,
+    fun setUpBrush(
+        color: Int = DEFAULT_BRUSH_COLOR,
+        width: Float = DEFAULT_BRUSH_WIDTH,
     ) {
         pen.color = color
-        pen.strokeWidth = width
-    }
-
-    fun setUpBrushWidth(width: Float = 10f) {
         pen.strokeWidth = width
         eraser.strokeWidth = width
     }
@@ -41,4 +37,9 @@ class BrushProvider @Inject constructor() {
     fun pen(): Paint = pen
 
     fun eraser(): Paint = eraser
+
+    companion object {
+        const val DEFAULT_BRUSH_COLOR = Color.BLACK
+        const val DEFAULT_BRUSH_WIDTH = 10f
+    }
 }

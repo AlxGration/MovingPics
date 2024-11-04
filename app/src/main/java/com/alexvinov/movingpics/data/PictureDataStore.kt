@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicLong
 class PictureDataStore(
     private val context: Context,
 ) {
-    private var width:Int? = null
-    private var height:Int? = null
+    private var width: Int? = null
+    private var height: Int? = null
     private val currentSize = AtomicLong(0)
     private var lastRemovePicture: Bitmap? = null
 

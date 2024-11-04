@@ -1,11 +1,9 @@
 package com.alexvinov.movingpics.presentation.views
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
@@ -14,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
 import com.alexvinov.movingpics.R
 import com.alexvinov.movingpics.databinding.ViewControlBrushSizeBinding
-import com.alexvinov.movingpics.databinding.ViewControlColorsBinding
 import com.alexvinov.movingpics.utils.toDp
 
 class ControlBrushSizeView(

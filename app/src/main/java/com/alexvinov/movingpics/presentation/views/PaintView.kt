@@ -40,7 +40,7 @@ class PaintView(
         setOnTouchListener(this)
     }
 
-    fun setPen(pen: Paint) {
+    fun setBrush(pen: Paint) {
         this.pen = pen
     }
 

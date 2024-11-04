@@ -4,11 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.Paint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.alexvinov.movingpics.domain.BrushProvider
+import com.alexvinov.movingpics.domain.BrushHolder
 import com.alexvinov.movingpics.domain.PictureRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PaintingFragmentViewModel @Inject constructor(
-    private val brushHolder: BrushProvider,
+    private val brushHolder: BrushHolder,
     private val pictureRepository: PictureRepository,
 ) : ViewModel() {
 
@@ -59,13 +58,10 @@ class PaintingFragmentViewModel @Inject constructor(
         calcEnablingActionButtons()
     }
 
-    fun setUpPen(color: Int, width: Float) {
-        brushHolder.setUpPen(color, width)
+    fun setUpBrush(color: Int? = null, width: Float? = null) {
+        color?.let { brushHolder.setUpBrush(color = color) }
+        width?.let { brushHolder.setUpBrush(width = width) }
         _brushState.value = brushHolder.pen()
-    }
-
-    fun setUpBrushWidth(width: Float) {
-        brushHolder.setUpBrushWidth(width)
     }
 
     fun pickPen() {

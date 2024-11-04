@@ -6,8 +6,8 @@ import javax.inject.Inject
 
 class HistoryHolder @Inject constructor() {
     // единица зарезервирована для хранения последнего кадра (в случае переполнения лимита)
-    private var history = LimitedDeque<Bitmap>(11)
-    private var historyBackup = LimitedDeque<Bitmap>(10)
+    private var history = LimitedDeque<Bitmap>(HISTORY_SIZE)
+    private var historyBackup = LimitedDeque<Bitmap>(HISTORY_SIZE)
 
     fun addLayer(bitmap: Bitmap) {
         val bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -44,5 +44,9 @@ class HistoryHolder @Inject constructor() {
     fun clear() {
         history.clear()
         historyBackup.clear()
+    }
+
+    companion object {
+        private const val HISTORY_SIZE = 10
     }
 }
