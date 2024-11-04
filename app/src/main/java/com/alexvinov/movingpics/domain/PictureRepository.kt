@@ -25,7 +25,7 @@ class PictureRepository @Inject constructor(
     }
 
     suspend fun savePicture(): Boolean {
-        val picture = historyHolder.lastPictureState()
+        val picture = historyHolder.lastPictureState() ?: picturesStore.lastRemovedPicture()
         picture?.let { picture ->
             picturesStore.save(picture)
             historyHolder.clear()
@@ -81,15 +81,11 @@ class PictureRepository @Inject constructor(
 
     suspend fun saveCurrentStateBeforeAnimation() {
         // сохраняем нарисованное, но не сохраненное
-        if (!savePicture()) {
-            // если сохранять нечего, то сохраним пустое изображение
-            // (чтобы после анимации вернуться на то же состояние, как перед запуском)
-            picturesStore.save(picturesStore.empty())
-        }
+        savePicture()
     }
 
     suspend fun restoreStateAfterAnimation() {
-        // тк перед началом анимации сохраняли текущий кадр в стор, то востановим его
+        // тк перед началом анимации сохраняли текущий кадр в стор, то востановим его для рисования
         removePicture()
     }
 

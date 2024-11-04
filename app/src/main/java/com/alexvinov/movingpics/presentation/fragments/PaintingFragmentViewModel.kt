@@ -73,12 +73,10 @@ class PaintingFragmentViewModel @Inject constructor(
     }
 
     fun addNewPicture() = viewModelScope.launch(Dispatchers.Default) {
-        if(!pictureRepository.isHistoryEmpty()) {
-            if (pictureRepository.savePicture()) {
-                _backgroundState.value = pictureRepository.backgroundWithLastPicture()
-                _pictureState.value = pictureRepository.emptyPicture()
-                calcEnablingActionButtons()
-            }
+        if (pictureRepository.savePicture()) {
+            _backgroundState.value = pictureRepository.backgroundWithLastPicture()
+            _pictureState.value = pictureRepository.emptyPicture()
+            calcEnablingActionButtons()
         }
     }
 
@@ -114,7 +112,7 @@ class PaintingFragmentViewModel @Inject constructor(
         _actionButtonState.value = ControlsButtonsEnableState(
             isUndoEnabled = hasActionsHistory && !isInAnimation,
             isRedoEnabled = pictureRepository.hasRedoActions() && !isInAnimation,
-            isNewPictureEnabled = hasActionsHistory && !isInAnimation,
+            isNewPictureEnabled = !isInAnimation,
             isAnimationPlaying = isInAnimation,
         )
     }
