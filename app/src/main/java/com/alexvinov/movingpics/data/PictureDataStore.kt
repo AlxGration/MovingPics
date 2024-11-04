@@ -23,7 +23,7 @@ class PictureDataStore(
     fun picturesSize() = currentSize.get()
 
     suspend fun initialBackgroundPicture(): Bitmap {
-        val bgDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_background, null)
+        val bgDrawable = ResourcesCompat.getDrawable(context.resources, R.drawable.ic_paper, null)
         val bgBitmap =
             Bitmap.createBitmap(
                 width ?: bgDrawable?.intrinsicWidth ?: 1,
