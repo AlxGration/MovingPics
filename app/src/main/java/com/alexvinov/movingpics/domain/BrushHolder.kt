@@ -14,7 +14,8 @@ class BrushHolder @Inject constructor() {
         pen.style = Paint.Style.STROKE
         pen.isAntiAlias = true
         pen.strokeJoin = Paint.Join.ROUND
-        setUpBrush()
+        setUpBrushColor(DEFAULT_BRUSH_COLOR)
+        setUpBrushWidth(DEFAULT_BRUSH_WIDTH)
 
         eraser.style = Paint.Style.STROKE
         eraser.isAntiAlias = true
@@ -25,11 +26,11 @@ class BrushHolder @Inject constructor() {
         eraser.strokeJoin = Paint.Join.ROUND
     }
 
-    fun setUpBrush(
-        color: Int = DEFAULT_BRUSH_COLOR,
-        width: Float = DEFAULT_BRUSH_WIDTH,
-    ) {
+    fun setUpBrushColor(color: Int) {
         pen.color = color
+    }
+
+    fun setUpBrushWidth(width: Float = DEFAULT_BRUSH_WIDTH) {
         pen.strokeWidth = width
         eraser.strokeWidth = width
     }
