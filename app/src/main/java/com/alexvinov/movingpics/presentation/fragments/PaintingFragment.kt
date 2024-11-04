@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.alexvinov.movingpics.databinding.FragmentFirstBinding
 import com.alexvinov.movingpics.databinding.ViewControlsTopBinding
+import com.alexvinov.movingpics.presentation.views.ControlBrushSizeView
 import com.alexvinov.movingpics.presentation.views.ControlColorView
 import com.alexvinov.movingpics.presentation.views.PaintView
 import dagger.hilt.android.AndroidEntryPoint
@@ -104,6 +105,9 @@ class PaintingFragment : Fragment() {
                     if (binding.viewControlColor.isVisible && buttonsState.isAnimationPlaying){
                         binding.viewControlColor.isVisible = false
                     }
+                    if (binding.viewControlBrushSize.isVisible && buttonsState.isAnimationPlaying){
+                        binding.viewControlBrushSize.isVisible = false
+                    }
                 }
             }
         }
@@ -112,7 +116,7 @@ class PaintingFragment : Fragment() {
     private fun setUpControls() {
         setUpTopControls()
         setUpBottomControls()
-        setUpColorControls()
+        setUpViewListeners()
     }
 
     private fun setUpTopControls() {
@@ -143,6 +147,10 @@ class PaintingFragment : Fragment() {
 
     private fun setUpBottomControls() {
         with(binding.bottomControlsContainer) {
+            brushSize.setOnClickListener {
+                binding.viewControlColor.isVisible = false
+                binding.viewControlBrushSize.isVisible = !binding.viewControlBrushSize.isVisible
+            }
             eraser.setOnClickListener {
                 viewModel.pickEraser()
             }
@@ -150,17 +158,23 @@ class PaintingFragment : Fragment() {
                 viewModel.pickPen()
             }
             colorPicker.setOnClickListener {
+                binding.viewControlBrushSize.isVisible = false
                 binding.viewControlColor.isVisible = !binding.viewControlColor.isVisible
             }
         }
     }
 
-    private fun setUpColorControls() {
+    private fun setUpViewListeners() {
         with(binding) {
             viewControlColor.setColorSelectedListener(object : ControlColorView.OnColorSelectedListener {
                 override fun onColorSelected(color: Int) {
                     viewModel.setUpPen(color, 10f)
                     bottomControlsContainer.colorPicker.imageTintList = ColorStateList.valueOf(color)
+                }
+            })
+            viewControlBrushSize.setBrushWidthChangedListener(object : ControlBrushSizeView.OnBrushWidthChangedListener {
+                override fun onBrushWidthChanged(width: Float) {
+                    viewModel.setUpBrushWidth(width)
                 }
             })
         }

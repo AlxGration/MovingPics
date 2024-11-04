@@ -13,6 +13,7 @@ class BrushProvider @Inject constructor() {
     init {
         pen.style = Paint.Style.STROKE
         pen.isAntiAlias = true
+        pen.strokeJoin = Paint.Join.ROUND
         setUpPen(color = Color.BLACK)
 
         eraser.style = Paint.Style.STROKE
@@ -30,6 +31,11 @@ class BrushProvider @Inject constructor() {
     ) {
         pen.color = color
         pen.strokeWidth = width
+    }
+
+    fun setUpBrushWidth(width: Float = 10f) {
+        pen.strokeWidth = width
+        eraser.strokeWidth = width
     }
 
     fun pen(): Paint = pen

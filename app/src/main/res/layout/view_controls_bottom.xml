@@ -7,6 +7,15 @@
     android:orientation="horizontal">
 
     <ImageButton
+        android:id="@+id/brush_size"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="16dp"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_brush_size" />
+
+    <ImageButton
         android:id="@+id/pen"
         android:layout_width="32dp"
         android:layout_height="32dp"

@@ -90,7 +90,7 @@ class PictureRepository @Inject constructor(
     }
 
     companion object {
-        private const val ANIMATION_DELAY_MILLIS = 500L
+        private const val ANIMATION_DELAY_MILLIS = 400L
         private val IS_ANIMATION_PLAYING = AtomicBoolean(false)
     }
 }
