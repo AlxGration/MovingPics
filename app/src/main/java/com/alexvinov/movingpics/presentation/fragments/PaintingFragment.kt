@@ -1,18 +1,22 @@
 package com.alexvinov.movingpics.presentation.fragments
 
 import android.content.res.ColorStateList
+import android.content.res.TypedArray
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.alexvinov.movingpics.R
 import com.alexvinov.movingpics.databinding.FragmentFirstBinding
 import com.alexvinov.movingpics.databinding.ViewControlsTopBinding
 import com.alexvinov.movingpics.presentation.views.ControlBrushSizeView
@@ -20,6 +24,7 @@ import com.alexvinov.movingpics.presentation.views.ControlColorView
 import com.alexvinov.movingpics.presentation.views.PaintView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class PaintingFragment : Fragment() {
@@ -71,21 +76,21 @@ class PaintingFragment : Fragment() {
 
     private fun setUpViewModelListeners() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.pictureState.collect { picture ->
                     binding.viewPaint.setPictureBitmap(picture)
                 }
             }
         }
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.backgroundState.collect { picture ->
                     binding.viewPaint.setBackgroundBitmap(picture)
                 }
             }
         }
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.brushState.collect { brush ->
                     binding.viewPaint.setBrush(brush)
                     binding.bottomControlsContainer.colorPicker.imageTintList = ColorStateList.valueOf(brush.color)
@@ -93,7 +98,7 @@ class PaintingFragment : Fragment() {
             }
         }
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.actionButtonState.collect { buttonsState ->
                     topControlsBinding?.redo?.isEnabled = buttonsState.isRedoEnabled
                     topControlsBinding?.undo?.isEnabled = buttonsState.isUndoEnabled
@@ -154,16 +159,20 @@ class PaintingFragment : Fragment() {
             brushSize.setOnClickListener {
                 binding.viewControlColor.isVisible = false
                 binding.viewControlBrushSize.isVisible = !binding.viewControlBrushSize.isVisible
+                highlightControl(brushSize.id)
             }
             eraser.setOnClickListener {
                 viewModel.pickEraser()
+                highlightControl(eraser.id)
             }
             pen.setOnClickListener {
                 viewModel.pickPen()
+                highlightControl(pen.id)
             }
             colorPicker.setOnClickListener {
                 binding.viewControlBrushSize.isVisible = false
                 binding.viewControlColor.isVisible = !binding.viewControlColor.isVisible
+                highlightControl(colorPicker.id)
             }
         }
     }
@@ -182,5 +191,22 @@ class PaintingFragment : Fragment() {
                 }
             })
         }
+    }
+
+    private fun highlightControl(id: Int) {
+        with(binding.bottomControlsContainer) {
+            val highlightedTint = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.green))
+            val plainTint = ColorStateList.valueOf(getPlainThemedColor())
+            brushSize.imageTintList = if (brushSize.id == id) highlightedTint else plainTint
+            eraser.imageTintList = if (eraser.id == id) highlightedTint else plainTint
+            pen.imageTintList = if (pen.id == id) highlightedTint else plainTint
+            colorPicker.backgroundTintList = if (colorPicker.id == id) highlightedTint else plainTint
+        }
+    }
+
+    private fun getPlainThemedColor(): Int {
+        val typedValue = TypedValue()
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorPrimaryContainer, typedValue, true)
+        return typedValue.data
     }
 }

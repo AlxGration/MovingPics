@@ -6,6 +6,6 @@
 
         <item name="colorPrimary">@color/black</item>
         <item name="colorSecondary">@color/grey</item>
-        <item name="colorContainer">@color/white</item>
+        <item name="colorPrimaryContainer">@color/white</item>
     </style>
 </resources>
