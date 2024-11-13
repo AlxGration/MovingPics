@@ -1,6 +1,7 @@
 package com.alexvinov.movingpics.domain
 
 import android.graphics.Bitmap
+import com.alexvinov.movingpics.data.HistoryDataStore
 import com.alexvinov.movingpics.data.PictureDataStore
 import com.alexvinov.movingpics.utils.BitmapUtils.mergeWith
 import kotlinx.coroutines.delay
@@ -11,26 +12,21 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class PictureRepository @Inject constructor(
-    private val historyHolder: HistoryHolder,
+    private val historyDataStore: HistoryDataStore,
     private val picturesStore: PictureDataStore,
 ) {
-    suspend fun addLayer(bitmap: Bitmap) = historyHolder.addLayer(bitmap)
+    suspend fun pushToHistory(bitmap: Bitmap) = historyDataStore.push(bitmap)
 
-    suspend fun nextLayer() = historyHolder.redoLastAction()
+    suspend fun redoLastAction() = historyDataStore.redoLastAction()
 
-    suspend fun previousLayer(): Bitmap {
-        return historyHolder.undoLastAction()
-            ?: picturesStore.empty()
-    }
+    suspend fun popFromHistory() = historyDataStore.undoLastAction()
 
     suspend fun savePicture(): Boolean {
         // последнее состояние из истории действий
-        val picture = historyHolder.lastPictureState() ?: return false
-        picture?.let { picture ->
-            picturesStore.save(picture)
-            historyHolder.clear()
-        }
-        return picture != null
+        val picture = historyDataStore.last() ?: return false
+        picturesStore.save(picture)
+        historyDataStore.clear()
+        return true
     }
 
     suspend fun background(): Bitmap = picturesStore.initialBackgroundPicture()
@@ -38,9 +34,9 @@ class PictureRepository @Inject constructor(
     suspend fun emptyPicture() = picturesStore.empty()
 
     suspend fun removePicture() {
-        historyHolder.clear()
+        historyDataStore.clear()
         // добавляем в историю операций
-        picturesStore.last()?.let { picture -> historyHolder.addLayer(picture) }
+        picturesStore.last()?.let { picture -> historyDataStore.push(picture) }
         picturesStore.removeLast()
     }
 
@@ -66,12 +62,12 @@ class PictureRepository @Inject constructor(
 
     fun isAnimationPlaying() = IS_ANIMATION_PLAYING.get()
 
-    fun isHistoryEmpty(): Boolean = !historyHolder.hasUndoActions()
+    fun isHistoryEmpty(): Boolean = !historyDataStore.hasUndoActions()
 
-    fun hasRedoActions() = historyHolder.hasRedoActions()
+    fun hasRedoActions() = historyDataStore.hasRedoActions()
 
     suspend fun backgroundWithLastPicture(): Bitmap {
-        val background = background()
+        val background = picturesStore.initialBackgroundPicture()
         return picturesStore.last()?.let {
             background.mergeWith(bitmap = lastOrEmptyPicture(), alpha = 60)
         } ?: background
@@ -94,7 +90,7 @@ class PictureRepository @Inject constructor(
         val picture = picturesStore.lastRemovedPicture() ?: picturesStore.empty()
 
         // добавляем в историю операций
-        addLayer(picture)
+        pushToHistory(picture)
         return picture
     }
 

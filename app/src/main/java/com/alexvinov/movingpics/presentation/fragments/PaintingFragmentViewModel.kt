@@ -38,7 +38,7 @@ class PaintingFragmentViewModel @Inject constructor(
     val actionButtonState: StateFlow<ControlsButtonsEnableState> = _actionButtonState.asStateFlow()
 
     fun addLayer(bitmap: Bitmap) = viewModelScope.launch(Dispatchers.Default) {
-        pictureRepository.addLayer(bitmap)
+        pictureRepository.pushToHistory(bitmap)
         calcEnablingActionButtons()
     }
 
@@ -47,14 +47,14 @@ class PaintingFragmentViewModel @Inject constructor(
     }
 
     fun redoLastAction() = viewModelScope.launch(Dispatchers.Default) {
-        pictureRepository.nextLayer()?.let { picture ->
+        pictureRepository.redoLastAction()?.let { picture ->
             _pictureState.value = picture
         }
         calcEnablingActionButtons()
     }
 
     fun undoLastAction() = viewModelScope.launch(Dispatchers.Default) {
-        _pictureState.value = pictureRepository.previousLayer()
+        _pictureState.value = pictureRepository.popFromHistory() ?: pictureRepository.emptyPicture()
         calcEnablingActionButtons()
     }
 

@@ -1,15 +1,15 @@
-package com.alexvinov.movingpics.domain
+package com.alexvinov.movingpics.data
 
 import android.graphics.Bitmap
 import com.alexvinov.movingpics.utils.LimitedDeque
 import javax.inject.Inject
 
-class HistoryHolder @Inject constructor() {
+class HistoryDataStore @Inject constructor() {
     // единица зарезервирована для хранения последнего кадра (в случае переполнения лимита)
     private var history = LimitedDeque<Bitmap>(HISTORY_SIZE)
     private var historyBackup = LimitedDeque<Bitmap>(HISTORY_SIZE)
 
-    fun addLayer(bitmap: Bitmap) {
+    fun push(bitmap: Bitmap) {
         val bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         history.push(bitmap)
         historyBackup.clear()
@@ -39,7 +39,7 @@ class HistoryHolder @Inject constructor() {
 
     fun hasUndoActions() = !history.isEmpty()
 
-    fun lastPictureState() = history.last()
+    fun last() = history.last()
 
     fun clear() {
         history.clear()

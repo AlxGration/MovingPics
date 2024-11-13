@@ -44,12 +44,13 @@ class PictureDataStore(
 
     suspend fun empty(): Bitmap = Bitmap.createBitmap(width ?: 1, height ?: 1, Bitmap.Config.ARGB_8888)
 
-    suspend fun last(): Bitmap? = getPictureFromInternalStorage(currentSize.get()-1)?.copy(Bitmap.Config.ARGB_8888, true)
+    suspend fun last(): Bitmap? = getPictureFromInternalStorage(currentSize.get() - 1)
+        ?.copy(Bitmap.Config.ARGB_8888, true)
 
     suspend fun removeLast() {
         lastRemovePicture = null
-        val picture = removePictureFromInternalStorage(currentSize.get()-1)
-        if (picture != null){
+        val picture = removePictureFromInternalStorage(currentSize.get() - 1)
+        if (picture != null) {
             currentSize.decrementAndGet()
             lastRemovePicture = picture
         }
