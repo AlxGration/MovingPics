@@ -61,7 +61,6 @@ class PaintingFragmentViewModel @Inject constructor(
     fun setUpBrush(color: Int? = null, width: Float? = null) {
         color?.let { brushHolder.setUpBrushColor(color = color) }
         width?.let { brushHolder.setUpBrushWidth(width = width) }
-        _brushState.value = brushHolder.pen()
     }
 
     fun pickPen() {

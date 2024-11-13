@@ -51,6 +51,7 @@ class PictureRepository @Inject constructor(
         return flow {
             while (IS_ANIMATION_PLAYING.get()) {
                 for (index in 0 until picturesStore.picturesSize()) {
+                    if (!IS_ANIMATION_PLAYING.get()) break
                     emit(picturesStore.getPictureFromInternalStorage(index))
                     delay(ANIMATION_DELAY_MILLIS)
                 }
