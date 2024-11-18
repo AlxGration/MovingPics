@@ -206,7 +206,7 @@ class PaintingFragment : Fragment() {
 
     private fun getPlainThemedColor(): Int {
         val typedValue = TypedValue()
-        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorPrimaryContainer, typedValue, true)
+        requireContext().theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)
         return typedValue.data
     }
 }

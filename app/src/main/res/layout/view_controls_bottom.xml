@@ -41,6 +41,6 @@
         android:layout_marginEnd="16dp"
         android:padding="2dp"
         android:background="@drawable/shape_ball"
-        android:backgroundTint="@color/grey"
+        android:backgroundTint="?attr/colorPrimary"
         android:src="@drawable/shape_ball"/>
 </LinearLayout>

@@ -14,6 +14,7 @@ class BrushHolder @Inject constructor() {
         pen.style = Paint.Style.STROKE
         pen.isAntiAlias = true
         pen.strokeJoin = Paint.Join.ROUND
+        pen.strokeCap = Paint.Cap.ROUND
         setUpBrushColor(DEFAULT_BRUSH_COLOR)
         setUpBrushWidth(DEFAULT_BRUSH_WIDTH)
 
@@ -24,6 +25,7 @@ class BrushHolder @Inject constructor() {
         eraser.maskFilter = null
         eraser.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
         eraser.strokeJoin = Paint.Join.ROUND
+        eraser.strokeCap = Paint.Cap.ROUND
     }
 
     fun setUpBrushColor(color: Int) {

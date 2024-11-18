@@ -7,8 +7,8 @@
         <item name="colorSecondary">@color/grey</item>
         <item name="colorPrimaryContainer">@color/white</item>
 
-        <item name="android:navigationBarColor">@android:color/white</item>
-        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:statusBarColor">@color/white</item>
     </style>
 
     <style name="Theme.MovingPics" parent="Base.Theme.MovingPics" />
